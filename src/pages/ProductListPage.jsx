@@ -92,6 +92,10 @@ export default function ProductListPage() {
   // ── Sync debounced query to URL ──
   // When the debounced search value changes, update `?q=` and reset to page 1.
   useEffect(() => {
+    const currentQ = searchParams.get('q') || '';
+    // Prevent redundant writes and unnecessary re-renders if query already matches URL
+    if (debouncedQuery === currentQ) return;
+
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
       if (debouncedQuery) {
@@ -104,7 +108,7 @@ export default function ProductListPage() {
       next.set('page', '1'); // new search = back to page 1
       return next;
     });
-  }, [debouncedQuery, setSearchParams]);
+  }, [debouncedQuery, searchParams, setSearchParams]);
 
   // ── Callback for when the hook clamps an out-of-range page ──
   const handlePageClamp = useCallback(
@@ -122,10 +126,13 @@ export default function ProductListPage() {
   // retryKey is incremented by handleRetry() to force a re-fetch on error
   const [retryKey, setRetryKey] = useState(0);
 
+  // URL is the source of truth for what to fetch (Rule 2)
+  const activeQuery = searchParams.get('q') || '';
+
   const { products, total, loading, error } = useProductsQuery({
     page,
     pageSize,
-    query: debouncedQuery,
+    query: activeQuery,
     category,
     sortBy,
     order,
