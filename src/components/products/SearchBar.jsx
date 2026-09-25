@@ -1,12 +1,5 @@
 import { Search, X } from 'lucide-react';
 
-/**
- * Controlled search input.
- *
- * The actual debouncing + API call happens in the parent (via useDebounce).
- * This component just renders the input and reports every keystroke upward
- * so the debounce logic has the raw, un-delayed value to work with.
- */
 export default function SearchBar({ value, onChange, disabled = false }) {
   return (
     <div className="relative flex-1 min-w-0">
@@ -22,7 +15,6 @@ export default function SearchBar({ value, onChange, disabled = false }) {
                    focus:border-brand-400 placeholder:text-gray-400
                    disabled:opacity-50 disabled:cursor-not-allowed"
       />
-      {/* Clear button — only shows when there's text */}
       {value && (
         <button
           onClick={() => onChange('')}

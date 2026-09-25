@@ -1,9 +1,5 @@
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 
-/**
- * Shown when a fetch fails. The `onRetry` callback re-runs the exact
- * request that failed, so the user doesn't have to refresh the page.
- */
 export default function ErrorState({ message = 'Something went wrong.', onRetry }) {
   return (
     <div className="flex flex-col items-center justify-center py-20 gap-4 text-gray-500">

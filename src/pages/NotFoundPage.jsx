@@ -1,9 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
-/**
- * Catch-all 404 page for unmatched routes.
- */
 export default function NotFoundPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">

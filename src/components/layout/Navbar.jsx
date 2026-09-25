@@ -3,12 +3,6 @@ import { useAuth } from '../../context/AuthContext';
 import { Package, LogOut, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 
-/**
- * Top navigation bar — always visible on authenticated pages.
- *
- * On mobile, the nav links collapse behind a hamburger menu
- * to keep the bar compact on small screens.
- */
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -23,7 +17,6 @@ export default function Navbar() {
     <nav className="sticky top-0 z-40 bg-white/80 backdrop-blur-lg border-b border-gray-200/60 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* ── Brand ── */}
           <Link
             to="/products"
             className="flex items-center gap-2 text-brand-600 font-bold text-lg hover:text-brand-700"
@@ -32,7 +25,6 @@ export default function Navbar() {
             <span className="hidden sm:inline">ProductHub</span>
           </Link>
 
-          {/* ── Desktop nav ── */}
           <div className="hidden md:flex items-center gap-6">
             <Link
               to="/products"
@@ -63,7 +55,6 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* ── Mobile hamburger ── */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100 cursor-pointer"
@@ -74,7 +65,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* ── Mobile menu dropdown ── */}
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-gray-100 bg-white/95 backdrop-blur-md">
           <div className="px-4 py-3 space-y-2">

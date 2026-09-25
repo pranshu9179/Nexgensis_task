@@ -1,11 +1,3 @@
-/**
- * Form-level validators for the product form.
- *
- * Each validator returns an error string or `''` (no error).
- * Keeping them as pure functions makes them easy to unit-test
- * and keeps the form component focused on rendering.
- */
-
 export function validateTitle(value) {
   const trimmed = (value || '').trim();
   if (!trimmed) return 'Title is required.';
@@ -32,10 +24,6 @@ export function validateCategory(value) {
   return '';
 }
 
-/**
- * Run all validators at once and return an errors object.
- * Keys match form field names; values are error strings (empty = valid).
- */
 export function validateProductForm({ title, price, stock, category }) {
   return {
     title: validateTitle(title),
@@ -45,9 +33,6 @@ export function validateProductForm({ title, price, stock, category }) {
   };
 }
 
-/**
- * Returns `true` if the errors object contains any non-empty string.
- */
 export function hasErrors(errors) {
   return Object.values(errors).some((msg) => msg !== '');
 }

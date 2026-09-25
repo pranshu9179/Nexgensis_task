@@ -1,16 +1,6 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { VALID_PAGE_SIZES } from '../../utils/urlParams';
 
-/**
- * Pagination controls: page-size selector, Previous/Next, numbered buttons,
- * and a "Showing X–Y of Z" range indicator.
- *
- * The numbered buttons use a "truncation" strategy so we never render
- * dozens of buttons:
- *   - Always show first and last page
- *   - Always show current ± 1
- *   - Fill gaps with "…"
- */
 export default function Pagination({
   page,
   pageSize,
@@ -23,12 +13,10 @@ export default function Pagination({
   const showingStart = total === 0 ? 0 : skip + 1;
   const showingEnd = Math.min(skip + pageSize, total);
 
-  // Build the list of page numbers/ellipses to render
   const pageButtons = buildPageButtons(page, totalPages);
 
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
-      {/* ── Range text + page size selector ── */}
       <div className="flex items-center gap-3 text-sm text-gray-500">
         <span>
           Showing <span className="font-medium text-gray-700">{showingStart}–{showingEnd}</span> of{' '}
@@ -46,9 +34,7 @@ export default function Pagination({
         </select>
       </div>
 
-      {/* ── Page buttons ── */}
       <div className="flex items-center gap-1">
-        {/* Previous */}
         <button
           onClick={() => onPageChange(page - 1)}
           disabled={page <= 1}
@@ -59,7 +45,6 @@ export default function Pagination({
           <ChevronLeft className="w-4 h-4" />
         </button>
 
-        {/* Numbered buttons / ellipses */}
         {pageButtons.map((item, idx) =>
           item === '...' ? (
             <span key={`dots-${idx}`} className="px-2 py-1 text-sm text-gray-400 select-none">
@@ -81,7 +66,6 @@ export default function Pagination({
           )
         )}
 
-        {/* Next */}
         <button
           onClick={() => onPageChange(page + 1)}
           disabled={page >= totalPages}
@@ -96,15 +80,6 @@ export default function Pagination({
   );
 }
 
-/**
- * Build an array like [1, '...', 4, 5, 6, '...', 20] for the page buttons.
- *
- * Rules:
- *   - Always include page 1 and the last page.
- *   - Always include `current - 1`, `current`, `current + 1`.
- *   - Insert '...' wherever there's a gap of more than 1.
- *   - If totalPages ≤ 7, just show all pages (no truncation needed).
- */
 function buildPageButtons(current, totalPages) {
   if (totalPages <= 7) {
     return Array.from({ length: totalPages }, (_, i) => i + 1);
@@ -112,12 +87,10 @@ function buildPageButtons(current, totalPages) {
 
   const pages = new Set([1, totalPages, current - 1, current, current + 1]);
 
-  // Remove any out-of-range values
   const sorted = [...pages]
     .filter((p) => p >= 1 && p <= totalPages)
     .sort((a, b) => a - b);
 
-  // Insert '...' between non-consecutive numbers
   const result = [];
   for (let i = 0; i < sorted.length; i++) {
     if (i > 0 && sorted[i] - sorted[i - 1] > 1) {

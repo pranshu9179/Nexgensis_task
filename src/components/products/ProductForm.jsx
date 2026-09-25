@@ -1,18 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Loader2, Upload, X, Image as ImageIcon } from 'lucide-react';
+import { Loader2, Upload, X,Image as ImageIcon } from 'lucide-react';
 import { validateProductForm, hasErrors } from '../../utils/validators';
 import { getCategories } from '../../api/productsApi';
 
-/**
- * Reusable product form shared by the Add and Edit flows.
- *
- * Receives `initialData` (empty for add, populated for edit) and calls
- * `onSubmit` with the validated form data. The parent page handles the
- * actual API call and navigation.
- *
- * Supports adding product images via either direct URL or local file upload
- * (converted to base64 Data URL for instant preview and local overlay display).
- */
 export default function ProductForm({ initialData, onSubmit, isSubmitting, submitLabel = 'Save' }) {
   const [categories, setCategories] = useState([]);
   const [form, setForm] = useState({
@@ -21,22 +11,19 @@ export default function ProductForm({ initialData, onSubmit, isSubmitting, submi
     stock: initialData?.stock ?? '',
     category: initialData?.category || '',
     description: initialData?.description || '',
-    // Product image: initialized from existing thumbnail or first image
     thumbnail: initialData?.thumbnail || initialData?.images?.[0] || '',
   });
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
 
-  // Fetch categories for the dropdown
   useEffect(() => {
     const controller = new AbortController();
     getCategories(controller.signal)
       .then(setCategories)
-      .catch(() => {}); // silent fail — the dropdown just stays empty
+      .catch(() => {});
     return () => controller.abort();
   }, []);
 
-  // Re-populate the form when initialData arrives (edit mode loads async)
   useEffect(() => {
     if (initialData) {
       setForm({
@@ -52,7 +39,6 @@ export default function ProductForm({ initialData, onSubmit, isSubmitting, submi
 
   function handleChange(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }));
-    // Re-validate touched fields live so errors disappear as the user fixes them
     if (touched[field]) {
       const newErrors = validateProductForm({ ...form, [field]: value });
       setErrors((prev) => ({ ...prev, [field]: newErrors[field] }));
@@ -65,9 +51,6 @@ export default function ProductForm({ initialData, onSubmit, isSubmitting, submi
     setErrors((prev) => ({ ...prev, [field]: newErrors[field] }));
   }
 
-  // ── Handle local image file upload ──
-  // Converts the selected image file to a base64 Data URL using FileReader.
-  // This allows instant preview and offline/mock-API persistence without needing a storage backend.
   function handleFileSelect(e) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -84,7 +67,6 @@ export default function ProductForm({ initialData, onSubmit, isSubmitting, submi
     reader.readAsDataURL(file);
   }
 
-  // ── Remove current image ──
   function handleRemoveImage() {
     handleChange('thumbnail', '');
   }
@@ -92,14 +74,12 @@ export default function ProductForm({ initialData, onSubmit, isSubmitting, submi
   function handleSubmit(e) {
     e.preventDefault();
 
-    // Validate all fields on submit
     const newErrors = validateProductForm(form);
     setErrors(newErrors);
     setTouched({ title: true, price: true, stock: true, category: true });
 
     if (hasErrors(newErrors)) return;
 
-    // Convert price and stock to numbers for the API and include image thumbnail
     onSubmit({
       ...form,
       price: Number(form.price),
@@ -111,7 +91,6 @@ export default function ProductForm({ initialData, onSubmit, isSubmitting, submi
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5 max-w-lg">
-      {/* ── Title ── */}
       <FormField label="Title" error={errors.title} touched={touched.title}>
         <input
           type="text"
@@ -123,7 +102,6 @@ export default function ProductForm({ initialData, onSubmit, isSubmitting, submi
         />
       </FormField>
 
-      {/* ── Price ── */}
       <FormField label="Price ($)" error={errors.price} touched={touched.price}>
         <input
           type="number"
@@ -137,7 +115,6 @@ export default function ProductForm({ initialData, onSubmit, isSubmitting, submi
         />
       </FormField>
 
-      {/* ── Stock ── */}
       <FormField label="Stock" error={errors.stock} touched={touched.stock}>
         <input
           type="number"
@@ -151,7 +128,6 @@ export default function ProductForm({ initialData, onSubmit, isSubmitting, submi
         />
       </FormField>
 
-      {/* ── Category ── */}
       <FormField label="Category" error={errors.category} touched={touched.category}>
         <select
           value={form.category}
@@ -168,10 +144,8 @@ export default function ProductForm({ initialData, onSubmit, isSubmitting, submi
         </select>
       </FormField>
 
-      {/* ── Product Image (optional: paste URL or upload file) ── */}
       <FormField label="Product Image (optional)">
         <div className="space-y-3">
-          {/* Direct URL input */}
           <input
             type="url"
             value={form.thumbnail}
@@ -180,7 +154,6 @@ export default function ProductForm({ initialData, onSubmit, isSubmitting, submi
             className={inputClasses(false)}
           />
 
-          {/* Local file upload option */}
           <div className="flex items-center gap-3">
             <label
               htmlFor="product-image-upload"
@@ -201,7 +174,6 @@ export default function ProductForm({ initialData, onSubmit, isSubmitting, submi
             <span className="text-xs text-gray-400">PNG, JPG, WebP, or GIF</span>
           </div>
 
-          {/* Live Preview with remove button */}
           {form.thumbnail && (
             <div className="relative inline-block mt-1">
               <img
@@ -228,7 +200,6 @@ export default function ProductForm({ initialData, onSubmit, isSubmitting, submi
         </div>
       </FormField>
 
-      {/* ── Description (optional) ── */}
       <FormField label="Description (optional)">
         <textarea
           value={form.description}
@@ -239,7 +210,6 @@ export default function ProductForm({ initialData, onSubmit, isSubmitting, submi
         />
       </FormField>
 
-      {/* ── Submit ── */}
       <button
         type="submit"
         disabled={isSubmitting}
@@ -260,9 +230,6 @@ export default function ProductForm({ initialData, onSubmit, isSubmitting, submi
   );
 }
 
-/**
- * Small wrapper for consistent form field layout + error display.
- */
 function FormField({ label, error, touched, children }) {
   return (
     <div>
@@ -277,9 +244,6 @@ function FormField({ label, error, touched, children }) {
   );
 }
 
-/**
- * Shared input class string. The `hasError` param toggles the red border.
- */
 function inputClasses(hasError) {
   return `w-full px-4 py-2.5 text-sm bg-white border rounded-xl
           focus:outline-none focus:ring-2 transition-colors

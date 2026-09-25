@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-/* ── Custom theme tokens for the dashboard ── */
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --color-brand-50: oklch(0.97 0.02 250);
@@ -21,18 +20,15 @@
   --color-warning-500: oklch(0.75 0.15 75);
 }
 
-/* ── Base styles ── */
 body {
   @apply bg-surface text-gray-800 font-sans antialiased;
   min-height: 100dvh;
 }
 
-/* ── Smooth transitions for interactive elements ── */
 a, button, input, select, textarea {
   @apply transition-colors duration-150;
 }
 
-/* ── Custom scrollbar (webkit only — graceful fallback on Firefox/others) ── */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;

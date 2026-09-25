@@ -4,12 +4,6 @@ import { useAuth } from '../context/AuthContext';
 import { login as loginApi } from '../api/authApi';
 import { LogIn, Loader2, Package, Eye, EyeOff } from 'lucide-react';
 
-/**
- * Login page — `/login`.
- *
- * Already-authenticated users are redirected straight to the product list
- * so the login form never flashes unnecessarily.
- */
 export default function LoginPage() {
   const { user, login } = useAuth();
   const navigate = useNavigate();
@@ -20,23 +14,20 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // If the user is already logged in, skip straight to products
   if (user) return <Navigate to="/products" replace />;
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (isSubmitting) return; // double-submit guard
+    if (isSubmitting) return;
 
     setError('');
     setIsSubmitting(true);
 
     try {
       const data = await loginApi(username, password);
-      login(data); // updates context + localStorage
+      login(data);
       navigate('/products', { replace: true });
     } catch (err) {
-      // Show the actual error from the API (e.g. "Invalid credentials")
-      // inline on the form, not just in the console.
       setError(err.message || 'Login failed. Please try again.');
     } finally {
       setIsSubmitting(false);
@@ -46,7 +37,6 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-brand-50 via-white to-brand-100 p-4">
       <div className="w-full max-w-md">
-        {/* ── Brand header ── */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl
                           bg-brand-500 text-white shadow-lg shadow-brand-500/25 mb-4">
@@ -56,17 +46,14 @@ export default function LoginPage() {
           <p className="text-sm text-gray-500 mt-1">Sign in to manage your products</p>
         </div>
 
-        {/* ── Login card ── */}
         <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Error message */}
             {error && (
               <div className="px-4 py-3 text-sm text-danger-500 bg-red-50 rounded-xl border border-red-100">
                 {error}
               </div>
             )}
 
-            {/* Username */}
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1.5">
                 Username
@@ -85,7 +72,6 @@ export default function LoginPage() {
               />
             </div>
 
-            {/* Password */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1.5">
                 Password
@@ -121,7 +107,6 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={isSubmitting}
@@ -144,7 +129,6 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Test credentials hint */}
           <div className="mt-6 pt-4 border-t border-gray-100">
             <p className="text-xs text-gray-400 text-center">
               Test credentials: <code className="text-brand-600">emilys</code> / <code className="text-brand-600">emilyspass</code>

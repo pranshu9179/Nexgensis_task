@@ -5,12 +5,6 @@ import { ArrowLeft, Star, Pencil, ChevronLeft, ChevronRight } from 'lucide-react
 import Loader from '../components/ui/Loader';
 import ErrorState from '../components/ui/ErrorState';
 
-/**
- * Product details page — `/products/:id`.
- *
- * Fetches the full product object including `images[]` and `reviews[]`.
- * An invalid id renders a dedicated Not Found view rather than crashing.
- */
 export default function ProductDetailsPage() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
@@ -31,7 +25,6 @@ export default function ProductDetailsPage() {
       })
       .catch((err) => {
         if (err.code === 'ERR_CANCELED') return;
-        // DummyJSON returns a 404-like error for invalid IDs — show Not Found
         if (err.response?.status === 404 || err.message?.toLowerCase().includes('not found')) {
           setNotFound(true);
         } else {
@@ -45,7 +38,6 @@ export default function ProductDetailsPage() {
     const controller = new AbortController();
     fetchProduct(controller.signal);
     return () => controller.abort();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   if (loading) return <Loader />;
@@ -76,7 +68,6 @@ export default function ProductDetailsPage() {
 
   if (!product) return null;
 
-  // Handle both images[] array and single thumbnail property
   const images =
     product.images && product.images.length > 0
       ? product.images
@@ -86,7 +77,6 @@ export default function ProductDetailsPage() {
 
   return (
     <div className="space-y-8">
-      {/* ── Back link ── */}
       <Link
         to="/products"
         className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-brand-600
@@ -97,9 +87,7 @@ export default function ProductDetailsPage() {
       </Link>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* ── Image gallery ── */}
         <div className="space-y-3">
-          {/* Main image */}
           <div className="relative aspect-square bg-white rounded-2xl border border-gray-200
                           overflow-hidden shadow-sm">
             {images.length > 0 && (
@@ -110,7 +98,6 @@ export default function ProductDetailsPage() {
               />
             )}
 
-            {/* Image navigation arrows */}
             {images.length > 1 && (
               <>
                 <button
@@ -133,7 +120,6 @@ export default function ProductDetailsPage() {
             )}
           </div>
 
-          {/* Thumbnail strip */}
           {images.length > 1 && (
             <div className="flex gap-2 overflow-x-auto pb-1">
               {images.map((src, idx) => (
@@ -154,7 +140,6 @@ export default function ProductDetailsPage() {
           )}
         </div>
 
-        {/* ── Product info ── */}
         <div className="space-y-6">
           <div>
             <span className="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full
@@ -167,9 +152,8 @@ export default function ProductDetailsPage() {
             )}
           </div>
 
-          {/* Price + rating */}
           <div className="flex items-center gap-4">
-            <span className="text-3xl font-bold text-gray-900">${product.price.toFixed(2)}</span>
+            <span className="text-3xl font-bold text-gray-900">${Number(product.price || 0).toFixed(2)}</span>
             {product.discountPercentage > 0 && (
               <span className="px-2 py-0.5 text-xs font-semibold text-success-500 bg-green-50
                                rounded-full">
@@ -178,11 +162,10 @@ export default function ProductDetailsPage() {
             )}
             <span className="flex items-center gap-1 text-amber-600">
               <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-              <span className="font-medium">{product.rating?.toFixed(1)}</span>
+              <span className="font-medium">{product.rating ? Number(product.rating).toFixed(1) : '—'}</span>
             </span>
           </div>
 
-          {/* Stock + metadata */}
           <div className="grid grid-cols-2 gap-3 text-sm">
             <InfoCard label="Stock" value={product.stock} />
             <InfoCard label="SKU" value={product.sku || '—'} />
@@ -190,13 +173,11 @@ export default function ProductDetailsPage() {
             <InfoCard label="Warranty" value={product.warrantyInformation || '—'} />
           </div>
 
-          {/* Description */}
           <div>
             <h3 className="text-sm font-semibold text-gray-700 mb-2">Description</h3>
             <p className="text-sm text-gray-600 leading-relaxed">{product.description}</p>
           </div>
 
-          {/* Edit link */}
           <Link
             to={`/products/${product.id}/edit`}
             className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold
@@ -209,7 +190,6 @@ export default function ProductDetailsPage() {
         </div>
       </div>
 
-      {/* ── Reviews section ── */}
       {product.reviews?.length > 0 && (
         <div className="space-y-4">
           <h2 className="text-lg font-bold text-gray-900">
@@ -246,9 +226,6 @@ export default function ProductDetailsPage() {
   );
 }
 
-/**
- * Small info card used in the product metadata grid.
- */
 function InfoCard({ label, value }) {
   return (
     <div className="bg-gray-50 rounded-lg p-3">

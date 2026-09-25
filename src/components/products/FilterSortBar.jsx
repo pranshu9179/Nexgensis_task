@@ -1,14 +1,6 @@
 import { SlidersHorizontal } from 'lucide-react';
 import { VALID_SORT_FIELDS } from '../../utils/urlParams';
 
-/**
- * Category dropdown + sort controls.
- *
- * When a search query is active, the category dropdown is disabled
- * with a hint — this is the "mutually exclusive" behavior documented
- * in NOTES.md. DummyJSON simply doesn't have an endpoint that
- * combines both search and category filtering.
- */
 export default function FilterSortBar({
   categories,
   category,
@@ -21,7 +13,6 @@ export default function FilterSortBar({
 }) {
   return (
     <div className="flex flex-wrap items-center gap-3">
-      {/* ── Category filter ── */}
       <div className="relative">
         <select
           value={category}
@@ -47,7 +38,6 @@ export default function FilterSortBar({
         )}
       </div>
 
-      {/* ── Sort field ── */}
       <div className="flex items-center gap-1.5">
         <SlidersHorizontal className="w-4 h-4 text-gray-400" />
         <select
@@ -66,7 +56,6 @@ export default function FilterSortBar({
         </select>
       </div>
 
-      {/* ── Sort order toggle — only shows when a sort field is selected ── */}
       {sortBy && (
         <button
           onClick={() => onOrderChange(order === 'asc' ? 'desc' : 'asc')}
