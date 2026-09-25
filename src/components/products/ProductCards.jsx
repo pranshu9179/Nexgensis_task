@@ -7,23 +7,31 @@ import { Eye, Pencil, Trash2, Star } from 'lucide-react';
  * Uses the same `products` array as ProductTable — no double-fetch.
  * Each card is a full-width stack with the same six data fields.
  */
-export default function ProductCards({ products, onDelete }) {
+export default function ProductCards({ products, onDelete, page = 1, pageSize = 10 }) {
   return (
     <div className="md:hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
-      {products.map((product) => (
-        <div
-          key={product.id}
-          className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden
-                     hover:shadow-md transition-shadow"
-        >
-          {/* Product image */}
-          <Link to={`/products/${product.id}`}>
-            <img
-              src={product.thumbnail || product.images?.[0]}
-              alt={product.title}
-              className="w-full h-40 object-cover"
-            />
-          </Link>
+      {products.map((product, index) => {
+        const rowNumber = (page - 1) * pageSize + index + 1;
+        return (
+          <div
+            key={product.id}
+            className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden
+                       hover:shadow-md transition-shadow"
+          >
+            {/* Product image + numbering badge */}
+            <div className="relative">
+              <Link to={`/products/${product.id}`}>
+                <img
+                  src={product.thumbnail || product.images?.[0]}
+                  alt={product.title}
+                  className="w-full h-40 object-cover"
+                />
+              </Link>
+              <span className="absolute top-2 left-2 px-2 py-0.5 text-xs font-semibold rounded-md
+                               bg-gray-900/70 text-white backdrop-blur-xs">
+                #{rowNumber}
+              </span>
+            </div>
 
           <div className="p-4 space-y-3">
             {/* Title + category */}
@@ -87,7 +95,8 @@ export default function ProductCards({ products, onDelete }) {
             </div>
           </div>
         </div>
-      ))}
+      );
+    })}
     </div>
   );
 }

@@ -258,8 +258,18 @@ export default function ProductListPage() {
       ) : (
         <>
           {/* Both views render from the same array — only CSS controls visibility */}
-          <ProductTable products={products} onDelete={setDeleteTarget} />
-          <ProductCards products={products} onDelete={setDeleteTarget} />
+          <ProductTable
+            products={products}
+            onDelete={setDeleteTarget}
+            page={page}
+            pageSize={pageSize}
+          />
+          <ProductCards
+            products={products}
+            onDelete={setDeleteTarget}
+            page={page}
+            pageSize={pageSize}
+          />
 
           <Pagination
             page={page}

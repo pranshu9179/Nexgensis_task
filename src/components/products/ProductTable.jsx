@@ -7,12 +7,13 @@ import { Eye, Pencil, Trash2, Star } from 'lucide-react';
  * Reads from the same `products` array as ProductCards — no separate fetch.
  * Each row links to the detail page and has edit/delete action buttons.
  */
-export default function ProductTable({ products, onDelete }) {
+export default function ProductTable({ products, onDelete, page = 1, pageSize = 10 }) {
   return (
     <div className="hidden md:block overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-gray-100 bg-gray-50/80">
+            <th className="text-center px-3 py-3 font-semibold text-gray-500 w-12">#</th>
             <th className="text-left px-4 py-3 font-semibold text-gray-600">Product</th>
             <th className="text-left px-4 py-3 font-semibold text-gray-600">Category</th>
             <th className="text-right px-4 py-3 font-semibold text-gray-600">Price</th>
@@ -22,14 +23,21 @@ export default function ProductTable({ products, onDelete }) {
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100">
-          {products.map((product) => (
-            <tr key={product.id} className="hover:bg-brand-50/40 transition-colors">
-              {/* Product: image + title */}
-              <td className="px-4 py-3">
-                <Link
-                  to={`/products/${product.id}`}
-                  className="flex items-center gap-3 group"
-                >
+          {products.map((product, index) => {
+            const rowNumber = (page - 1) * pageSize + index + 1;
+            return (
+              <tr key={product.id} className="hover:bg-brand-50/40 transition-colors">
+                {/* Numbering */}
+                <td className="px-3 py-3 text-center text-xs font-semibold text-gray-400">
+                  {rowNumber}
+                </td>
+
+                {/* Product: image + title */}
+                <td className="px-4 py-3">
+                  <Link
+                    to={`/products/${product.id}`}
+                    className="flex items-center gap-3 group"
+                  >
                   <img
                     src={product.thumbnail || product.images?.[0]}
                     alt={product.title}
@@ -100,8 +108,9 @@ export default function ProductTable({ products, onDelete }) {
                 </div>
               </td>
             </tr>
-          ))}
-        </tbody>
+          );
+        })}
+      </tbody>
       </table>
     </div>
   );
