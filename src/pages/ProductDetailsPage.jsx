@@ -76,7 +76,13 @@ export default function ProductDetailsPage() {
 
   if (!product) return null;
 
-  const images = product.images || [];
+  // Handle both images[] array and single thumbnail property
+  const images =
+    product.images && product.images.length > 0
+      ? product.images
+      : product.thumbnail
+        ? [product.thumbnail]
+        : [];
 
   return (
     <div className="space-y-8">

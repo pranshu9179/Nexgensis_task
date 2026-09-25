@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Upload, X, Image as ImageIcon } from 'lucide-react';
 import { validateProductForm, hasErrors } from '../../utils/validators';
 import { getCategories } from '../../api/productsApi';
 
@@ -9,6 +9,9 @@ import { getCategories } from '../../api/productsApi';
  * Receives `initialData` (empty for add, populated for edit) and calls
  * `onSubmit` with the validated form data. The parent page handles the
  * actual API call and navigation.
+ *
+ * Supports adding product images via either direct URL or local file upload
+ * (converted to base64 Data URL for instant preview and local overlay display).
  */
 export default function ProductForm({ initialData, onSubmit, isSubmitting, submitLabel = 'Save' }) {
   const [categories, setCategories] = useState([]);
@@ -18,6 +21,8 @@ export default function ProductForm({ initialData, onSubmit, isSubmitting, submi
     stock: initialData?.stock ?? '',
     category: initialData?.category || '',
     description: initialData?.description || '',
+    // Product image: initialized from existing thumbnail or first image
+    thumbnail: initialData?.thumbnail || initialData?.images?.[0] || '',
   });
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
@@ -40,6 +45,7 @@ export default function ProductForm({ initialData, onSubmit, isSubmitting, submi
         stock: initialData.stock ?? '',
         category: initialData.category || '',
         description: initialData.description || '',
+        thumbnail: initialData.thumbnail || initialData.images?.[0] || '',
       });
     }
   }, [initialData]);
@@ -59,6 +65,30 @@ export default function ProductForm({ initialData, onSubmit, isSubmitting, submi
     setErrors((prev) => ({ ...prev, [field]: newErrors[field] }));
   }
 
+  // ── Handle local image file upload ──
+  // Converts the selected image file to a base64 Data URL using FileReader.
+  // This allows instant preview and offline/mock-API persistence without needing a storage backend.
+  function handleFileSelect(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload a valid image file (PNG, JPG, WebP, etc.).');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (uploadEvent) => {
+      handleChange('thumbnail', uploadEvent.target.result);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // ── Remove current image ──
+  function handleRemoveImage() {
+    handleChange('thumbnail', '');
+  }
+
   function handleSubmit(e) {
     e.preventDefault();
 
@@ -69,11 +99,13 @@ export default function ProductForm({ initialData, onSubmit, isSubmitting, submi
 
     if (hasErrors(newErrors)) return;
 
-    // Convert price and stock to numbers for the API
+    // Convert price and stock to numbers for the API and include image thumbnail
     onSubmit({
       ...form,
       price: Number(form.price),
       stock: Number(form.stock),
+      thumbnail: form.thumbnail || '',
+      images: form.thumbnail ? [form.thumbnail] : [],
     });
   }
 
@@ -134,6 +166,66 @@ export default function ProductForm({ initialData, onSubmit, isSubmitting, submi
             </option>
           ))}
         </select>
+      </FormField>
+
+      {/* ── Product Image (optional: paste URL or upload file) ── */}
+      <FormField label="Product Image (optional)">
+        <div className="space-y-3">
+          {/* Direct URL input */}
+          <input
+            type="url"
+            value={form.thumbnail}
+            onChange={(e) => handleChange('thumbnail', e.target.value)}
+            placeholder="Paste image URL (https://…)"
+            className={inputClasses(false)}
+          />
+
+          {/* Local file upload option */}
+          <div className="flex items-center gap-3">
+            <label
+              htmlFor="product-image-upload"
+              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium
+                         text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-xl cursor-pointer
+                         transition-colors border border-gray-200"
+            >
+              <Upload className="w-3.5 h-3.5 text-gray-500" />
+              Upload Image File
+            </label>
+            <input
+              id="product-image-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+            <span className="text-xs text-gray-400">PNG, JPG, WebP, or GIF</span>
+          </div>
+
+          {/* Live Preview with remove button */}
+          {form.thumbnail && (
+            <div className="relative inline-block mt-1">
+              <img
+                src={form.thumbnail}
+                alt="Product preview"
+                className="w-24 h-24 object-cover rounded-xl border border-gray-200 shadow-xs bg-gray-50"
+                onError={(e) => {
+                  e.target.style.opacity = '0.5';
+                }}
+              />
+              <button
+                type="button"
+                onClick={handleRemoveImage}
+                className="absolute -top-2 -right-2 p-1 bg-red-500 hover:bg-red-600
+                           text-white rounded-full shadow-md transition-transform
+                           hover:scale-110 cursor-pointer"
+                title="Remove image"
+                aria-label="Remove image"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
+        </div>
       </FormField>
 
       {/* ── Description (optional) ── */}
